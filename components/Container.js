@@ -1,13 +1,10 @@
-module.exports = {
-  render: function(state, children) {
-    return h(
-      "div",
-      null,
-      [
-        Link('#/', 'Home'),
-        Link('#/about', 'About'),
-       children
-      ]
-    );
-  }
+var Header = require('./Header.js');
+var Nav = require('./Nav.js');
+
+module.exports = function(children) {
+  return h('div', {key: 'Container'}, [
+    Header(this.state),
+    Nav(this.state),
+    children
+  ]);
 };

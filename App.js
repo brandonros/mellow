@@ -6,21 +6,30 @@ var createElement = virtualDom.create;
 var App = function(state, render) {
   var self = this;
 
-  self.state = new Proxy(state, {
+  var handler = {
     set: function(obj, prop, value) {
-      obj[prop] = value;
+      obj[prop] = value; 
 
-      Promise.resolve(render(obj))
-      .then(function(newTree) {
-        var patches = diff(self.tree, newTree);
-
-        self.rootNode = patch(self.rootNode, patches);
-        self.tree = newTree;
-      });
+      setTimeout(function() {
+        self.redraw();
+      }, 0);
 
       return true;
+    },
+    get: function(obj, key) {
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        return new Proxy(obj[key], handler);
+      } else {
+        return obj[key];
+      }
     }
-  });
+  };
+
+  self.state = new Proxy(state, handler);
+};
+
+App.prototype.init = function() {
+  var self = this;
 
   Promise.resolve(render(self.state))
   .then(function(tree) {
@@ -30,3 +39,15 @@ var App = function(state, render) {
     document.body.appendChild(self.rootNode);
   });
 };
+
+App.prototype.redraw = function() {
+  var self = this;
+
+  Promise.resolve(render(self.state))
+  .then(function(newTree) {
+    var patches = diff(self.tree, newTree);
+
+    self.rootNode = patch(self.rootNode, patches);
+    self.tree = newTree;
+  });
+}; 

@@ -1,29 +1,19 @@
 <!doctype html>
 <html>
   <head>
+      <link rel="stylesheet" type="text/css"  href="lib/bootstrap.css">
   </head>
 
   <body>
     <script type="text/javascript" src="lib/system.js"></script>
     <script type="text/javascript" src="lib/virtual-dom.js"></script>
+    <script type="text/javascript" src="lib/moment.js"></script>
 
     <script type="text/javascript" src="App.js"></script>
 
     <script type="text/javascript">
       var calculateLocationHash = function() {
         return window.location.hash || '#/';
-      };
-
-      var Link = function(href, children) {
-        return h('a', {href: href}, children);
-      };
-
-      var state = {
-        hash: calculateLocationHash(),
-        routePaths: {
-          '#/': './components/Home.js',
-          '#/about': './components/About.js'
-        }
       };
 
       var render = function(state) {
@@ -35,14 +25,49 @@
           var Router = results[0];
           var Container = results[1];
 
-          return Router.render(state)
+          return Router.call(app)
             .then(function(children) {
-              return Container.render(state, children);
+              return Container.call(app, children);
             });
         });
       };
 
+      var state = {
+        hash: calculateLocationHash(),
+        routePaths: {
+          '#/': './components/Dashboard.js',
+          '#/accountSummary': './components/AccountSummary.js'
+        },
+        userName: 'Brandon',
+        select: 'value',
+        text: 'text',
+        textarea: 'textarea',
+        radio: '2',
+        table: {
+          sorting: {
+            columnId: 'name',
+            direction: 'ascending'
+          },
+          columns: [
+            {id: 'name', label: 'Name'},
+            {id: 'age', label: 'Age'}
+          ],
+          rows: [
+            {name: 'Brandon', age: 24},
+            {name: 'Laine', age: 21}
+          ]
+        },
+        navOptions: [
+          {
+            link: '#/accountSummary',
+            title: 'Account Summary'
+          }
+        ]
+      };
+
       var app = new App(state, render);
+
+      app.init();
 
       window.addEventListener('hashchange', function() {
         app.state.hash = calculateLocationHash();

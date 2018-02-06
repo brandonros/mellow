@@ -1,8 +1,8 @@
-module.exports = {
-  render: function(state) {
-    return SystemJS.import(state.routePaths[state.hash])
-      .then(function(routeComponent) {
-        return routeComponent.render(state);
-      });
-  }
+module.exports = function() {
+  var self = this;
+  
+  return SystemJS.import(self.state.routePaths[state.hash])
+    .then(function(routeComponent) {
+      return routeComponent.call(self);
+    });
 };
